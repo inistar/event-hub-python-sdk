@@ -16,4 +16,5 @@ if __name__ == '__main__':
 
     e = EventHubClient()
     # e.publish_event(event_type, event_metadata)
+    # e.publish_event_batch(events)
     e.publish_event_batch("sample_events_data.csv")
