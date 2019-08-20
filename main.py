@@ -1,9 +1,6 @@
-from event_hub_hook import EventHub
+from event_hub_client import EventHubClient
 
-def publish_event():
-    conn_url = "http://localhost"
-    port = 8083
-    data = {}
+if __name__ == '__main__':
     json_data = """{
                     "name": "Website Visited",
                     "orgId": "dzFyTqq4dT7YIai8mogz",
@@ -12,9 +9,5 @@ def publish_event():
                     "timestamp": "2019-07-09T14:54:44.760Z"
                 }"""
 
-    data['jsonData'] = json_data
-    e = EventHub(conn_url, port)
-    e.publish_event(data)
-
-if __name__ == '__main__':
-    publish_event()
+    e = EventHubClient()
+    e.publish_event(json_data)
