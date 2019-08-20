@@ -9,9 +9,16 @@ class EventHubClient():
         self.headers = {'content-type': 'application/x-www-form-urlencoded'}
 
     def publish_event(self, event_type, event_metadata):
+        """
+        Publish event to /publish endpoint. 
 
+        :param event_type: Name of the event.
+        :type event_type: str
+        :param event_metadata: Event metadata.
+        :type event_metadata: dict
+        """
         json_data = self.convertToJson(event_type, event_metadata)
-
+        
         publish_url = self.conn_url + ':' + str(self.port) + '/publish'
         
         data = {}
@@ -25,11 +32,30 @@ class EventHubClient():
             for event in events:
                 self.publish_event(event[0], event[1])
         elif type(events) == str:
-            print("string")
+            with open(events) as fp:
+                for line in fp:
+
+                    event = line.split(";")
+                    event[0] = event[0].replace("'", "").replace("\"", "")
+                    event[1] = json.loads(event[1].replace("'", "\""))
+
+                    self.publish_event(event[0], event[1])
         else:
             print("Unknown parameters passed")
         
+    def convertToDict(self, data):
+        data = data.replace("'", "\"")
+        return json.loads(data)
+
     def convertToJson(self, event_type, event_metadata):
+        """
+        Format event data to JSON format.
+
+        :param event_type: Name of the event.
+        :type event_type: str
+        :param event_metadata: Event metadata.
+        :type event_metadata: dict
+        """
         json_dict = {'name': event_type}
         
         for key in event_metadata.keys():
