@@ -6,7 +6,7 @@ class EventHubClient():
     def __init__(self):
         self.conn_url = "http://localhost"
         self.port = 8083
-        self.headers = {'content-type': 'application/x-www-form-urlencoded'}
+        self.headers = {'content-type': 'application/json'}
 
     def publish_event(self, event_type, event_metadata):
         """
@@ -20,11 +20,8 @@ class EventHubClient():
         json_data = self.convertToJson(event_type, event_metadata)
         
         publish_url = self.conn_url + ':' + str(self.port) + '/publish'
-        
-        data = {}
-        data['jsonData'] = json_data
 
-        print(requests.post(publish_url, data=data, headers=self.headers))
+        print(requests.post(publish_url, data=json_data, headers=self.headers))
 
     def publish_event_batch(self, events):
         
