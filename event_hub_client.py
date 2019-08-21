@@ -26,9 +26,10 @@ class EventHubClient():
     def publish_event_batch(self, events):
         
         if type(events) == list:
-            for event in events:
-                self.publish_event(event[0], event[1])
+            json_data = self.convertToJsonBatch(events)
+
         elif type(events) == str:
+            data = []
             with open(events) as fp:
                 for line in fp:
 
@@ -36,14 +37,16 @@ class EventHubClient():
                     event[0] = event[0].replace("'", "").replace("\"", "")
                     event[1] = json.loads(event[1].replace("'", "\""))
 
-                    self.publish_event(event[0], event[1])
+                    data.append((event[0], event[1]))
+                
+            json_data = self.convertToJsonBatch(data)
         else:
             print("Unknown parameters passed")
         
-    def convertToDict(self, data):
-        data = data.replace("'", "\"")
-        return json.loads(data)
+        publish_url = self.conn_url + ':' + str(self.port) + '/publishBatch'
 
+        print(requests.post(publish_url, data=json_data, headers=self.headers))
+        
     def convertToJson(self, event_type, event_metadata):
         """
         Format event data to JSON format.
@@ -61,3 +64,14 @@ class EventHubClient():
         json_obj = json.dumps(json_dict)
         
         return str(json_obj)
+    
+    def convertToJsonBatch(self, events):
+        results = []
+
+        for event in events:
+            json_data = self.convertToJson(event[0], event[1])
+            results.append(json_data)
+        
+        results = str(results).replace("'", "")
+
+        return results
